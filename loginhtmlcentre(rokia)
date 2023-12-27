@@ -13,6 +13,8 @@
 <head>
     <p> Willkommen zu <strong>Lieferspatz</strong></p>
 </head>
+
+
 <body>
     <form method="POST">
     <label for="email">Email:</label><br>
