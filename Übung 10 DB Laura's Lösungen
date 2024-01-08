@@ -1,0 +1,36 @@
+--Aufgabe 1a)
+select k.KName, v.Lagerbestand 
+from Variante v, Kaffeesorte k 
+where v.Lagerbestand = (select min(v.Lagerbestand))
+											from Variante)
+
+--Aufgabe 1b)
+select SName,
+from Shop s, 
+where s.Stadt='Bohnen%'
+
+--Aufgabe 1c)
+select 
+
+--Aufgabe 1d)
+select
+
+--Aufgabe 2a) ohne Assistenten BIN MIR NICHT SICHER OB ES RICHTIG IST 
+
+select tmp.Name, tmp.AnzahlEinträge,
+from (select s.name, s.semester, count(*) as AnzahlEinträge
+			from Studenten s, hoeren h, pruefen p, 
+			where s.matrnr = h.matrnr and s.matrnr = p.matrnr
+			order by asc tmp.AnzahlEinträge) tmp
+union
+from (select pr.name,
+			from Professoren pr,vorlesungen v, assistenten a, pruefen p, count(*) as AnzahlEinträge
+			where pr.persnr = v.gelesenvon and pr.persnr = a.boss
+				and pr.persnr = p.persnr
+
+--Aufgabe 2c)
+select v.titel,
+from Vorlesungen v, 
+where
+
+
