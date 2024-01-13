@@ -1,0 +1,132 @@
+import os
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+
+app = Flask(__name__)
+
+# Database Configuration
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'order.db')
+
+# Database Configuration
+#basedir = os.path.abspath(os.path.dirname(__file__))
+#database_path = os.path.join(basedir, 'database')  # Construct path to database folder
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(database_path, 'order.db')
+
+app.static_folder = 'static'
+
+app.config['SECRET_KEY'] = 'your_strong_secret_key'  # Replace with a secure key
+db = SQLAlchemy(app)
+
+# Customer Model
+class Customer(db.Model):
+    __tablename__ = 'customers'
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.Text, nullable=False)
+    last_name = db.Column(db.Text, nullable=False)
+    email = db.Column(db.Text, nullable=False, unique=True)
+    phone_number = db.Column(db.Text, nullable=False)
+    address = db.Column(db.Text)
+    city = db.Column(db.Text)
+    state = db.Column(db.Text)
+    zip_code = db.Column(db.Text)
+    password = db.Column(db.Text, nullable=False)
+
+# Create the database table within the application context
+with app.app_context():
+    db.create_all()
+
+# Routes
+@app.route('/')
+def home():
+    first_name = session.get('first_name')
+    last_name = session.get('last_name')
+    if first_name and last_name:
+        flash(f"Welcome back, {first_name} {last_name}!", 'success')  # Personalized message for returning users
+    else:
+        flash('Please login or create an account to continue.', 'info')  # Informational message for non-logged-in users
+    return render_template('home.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        try:
+            customer = Customer.query.filter_by(email=email).first()
+            #if customer and customer.password == password:
+            if customer and check_password_hash(customer.password, password):
+                session['email'] = customer.email
+                session['first_name'] = customer.first_name  # Store first name in session
+                session['last_name'] = customer.last_name   # Store last name in session
+                flash('Login successful!', 'success')
+                return redirect(url_for('home'))
+            else:
+                flash('Invalid email or password', 'danger')
+        except Exception as e:
+            flash('An error occurred while processing your login request.', 'danger')
+            print(f"Error: {e}")  # Log the error for debugging
+
+    return render_template('login.html')
+
+@app.route('/create-user', methods=['GET', 'POST'])
+def create_user():
+    if request.method == 'POST':
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        phone_number = request.form['phone_number']
+        address = request.form['address']
+        city = request.form['city']
+        state = request.form['state']
+        zip_code = request.form['zip_code']
+        password = request.form['password']
+
+        try:
+            # Check for existing user with the same email
+            existing_user = Customer.query.filter_by(email=email).first()
+            if existing_user:
+                flash('A user with that email already exists.', 'danger')
+                return redirect(url_for('create_user'))
+
+            # Create a new user with a hashed password
+            password_hash = generate_password_hash(password)
+            new_user = Customer(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone_number=phone_number,
+                address=address,
+                city=city,
+                state=state,
+                zip_code=zip_code,
+                password=password_hash
+            )
+            db.session.add(new_user)
+            db.session.commit()
+
+            flash('User created successfully!', 'success')
+            return redirect(url_for('home'))  # Redirect to the home page after successful creation
+        except Exception as e:
+            flash('An error occurred while creating the user.', 'danger')
+            print(f"Error: {e}")  # Log the error for debugging
+
+    # Render the create_user.html template for GET requests
+    return render_template('create_user.html')
+
+
+
+
+@app.route('/logout')
+def logout():
+    session.pop('email', None)
+    session.pop('first_name', None)
+    session.pop('last_name', None)
+    session.clear()
+    flash('You have been logged out', 'success')
+    return redirect(url_for('home'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
