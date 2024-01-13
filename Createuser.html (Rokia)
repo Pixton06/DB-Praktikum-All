@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Create User</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+<body>
+{% extends "base.html" %}
+
+{% block title %}Create User - Food Mania{% endblock %}
+
+{% block content %}
+<h1>Create a New User</h1>
+
+<form method="POST" class="container col-md-10">
+    <div class="form-group">
+        <label for="first_name">First Name:</label>
+        <input type="text" class="form-control" id="first_name" name="first_name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="last_name">Last Name:</label>
+        <input type="text" class="form-control" id="last_name" name="last_name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+
+    <div class="form-group">
+        <label for="phone_number">Phone Number:</label>
+        <input type="tel" class="form-control" id="phone_number" name="phone_number" required>
+    </div>
+
+    <div class="form-group">
+        <label for="address">Address:</label>
+        <input type="text" class="form-control" id="address" name="address">
+    </div>
+
+    <div class="form-group">
+        <label for="city">City:</label>
+        <input type="text" class="form-control" id="city" name="city">
+    </div>
+
+    <div class="form-group">
+        <label for="state">State:</label>
+        <input type="text" class="form-control" id="state" name="state">
+    </div>
+
+    <div class="form-group">
+        <label for="zip_code">Zip Code:</label>
+        <input type="text" class="form-control" id="zip_code" name="zip_code">
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create User</button>
+</form>
+
+{% for message in get_flashed_messages() %}
+    <p>{{ message }}</p>
+{% endfor %}
+
+{% endblock %}
+
+</body>
+</html>
